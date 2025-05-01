@@ -1,4 +1,3 @@
-ChessTracker
 ChessTracker is a web application that allows users to look up chess players and view detailed statistics such as recent matches and current ratings. The data is fetched from the chess.com public API.
 
 🧩 Project Overview
