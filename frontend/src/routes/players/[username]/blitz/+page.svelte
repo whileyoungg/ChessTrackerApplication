@@ -1,9 +1,8 @@
 <script>
-    import {page} from '$app/stores';
-    import {onMount} from 'svelte';
-    import {get} from 'svelte/store';
-    import {Chart, registerables} from 'chart.js';
-
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    import { get } from 'svelte/store';
+    import { Chart, registerables } from 'chart.js';
     Chart.register(...registerables);
 
     let games = [];
@@ -20,6 +19,14 @@
             console.error('Failed to fetch rapid games');
         }
     });
+    function formatDate(timestamp) {
+        // If it's in seconds, convert to milliseconds
+        if (timestamp < 1000000000000) {
+            timestamp *= 1000;
+        }
+        const date = new Date(timestamp);
+        return date.toLocaleString(); // You can adjust toLocaleString options for formatting
+    }
 
     function resultColor(result) {
         if (result === 'W') return 'green';
@@ -27,7 +34,6 @@
         if (result === 'L') return 'red';
         return 'gray';
     }
-
     function drawChart() {
         if (chartInstance) {
             chartInstance.destroy();
@@ -49,17 +55,18 @@
             ]
         };
 
+
         const config = {
             type: 'line',
             data,
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {labels: {color: 'white'}}
+                    legend: { labels: { color: 'white' } }
                 },
                 scales: {
-                    x: {ticks: {color: 'white'}},
-                    y: {ticks: {color: 'white'}}
+                    x: { ticks: { color: 'white' } },
+                    y: { ticks: { color: 'white' } }
                 }
             }
         };
@@ -86,18 +93,15 @@
         margin-bottom: 1rem;
         border-radius: 8px;
     }
-
     .game-header {
         display: flex;
         justify-content: space-between;
         margin-bottom: 0.8rem;
     }
-
     .game-mode {
         font-style: italic;
         color: #a8d0e6;
     }
-
     .game-result {
         font-weight: bold;
         color: #ffdd57;
@@ -112,7 +116,6 @@
         text-decoration: underline; /* Adds underline on hover */
         color: #ffdd57; /* Optionally change the color when hovered */
     }
-
     .match-url-btn {
         background-color: #4CAF50; /* Green */
         color: white;
@@ -130,7 +133,6 @@
         width: 2cm;
         height: 1cm;
     }
-
     canvas {
         margin-bottom: 2rem;
         background-color: #2f3e46;
@@ -155,7 +157,7 @@
                     <span class="game-mode">{game.mode}</span>
                     <span class="game-result" style="color: {resultColor(game.result)}">{game.result}</span>
                 </div>
-
+                <p style="color: #ccc; font-size: 0.9rem;">Ended on: {formatDate(game.endTime)}</p>
                 {#if game.isWhite}
                     <strong>{username} ({game.playerRating})</strong> vs
                     <a href={`/players/${game.opponent}`} class="game-opponent">

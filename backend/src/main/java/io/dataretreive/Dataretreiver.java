@@ -13,8 +13,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+
 @Component
 public class Dataretreiver {
 private String correctNickname;
@@ -63,6 +66,8 @@ private String correctNickname;
                     String blackResult = game.getAsJsonObject("black").get("result").getAsString();
 
                     long endTime = game.get("end_time").getAsLong();
+                    Instant instant = Instant.ofEpochSecond(endTime);
+
                     int playerRating = 0;
                     int opponentRating = 0;
                     String result = "?";
@@ -97,9 +102,9 @@ private String correctNickname;
                         }
                     }
 
-                    matches.add(new Match(urlString, result, mode.toUpperCase(), endTime, opponentNickname, isWhite, playerRating, opponentRating));
+                    matches.add(new Match(urlString, result, mode.toUpperCase(), instant, opponentNickname, isWhite, playerRating, opponentRating));
                 }
-                matches.sort((m1, m2) -> Long.compare(m2.endTime(), m1.endTime()));
+                matches.sort(Comparator.comparing(Match::endTime).reversed());
 
                 matches = new ArrayList<>(matches.stream().limit(60).toList());
             }

@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +34,11 @@ public class PlayerManagerTest {
     ArrayList<Match> matchList;
     @BeforeEach
     void setUp() {
-        match1 = new Match("123","W","BLITZ",123,"123",true,555,777);
-        match2 = new Match("123","W","RAPID",123,"123",true,555,777);
-        match3 = new Match("123","W","BULLET",123,"123",true,555,777);
-        match4 = new Match("123","W","BULLET",123,"123",true,555,777);
-        match5 = new Match("123","W","RAPID",123,"123",true,555,777);
+        match1 = new Match("123","W","BLITZ", Instant.now(),"123",true,555,777);
+        match2 = new Match("123","W","RAPID",Instant.now(),"123",true,555,777);
+        match3 = new Match("123","W","BULLET",Instant.now(),"123",true,555,777);
+        match4 = new Match("123","W","BULLET",Instant.now(),"123",true,555,777);
+        match5 = new Match("123","W","RAPID",Instant.now(),"123",true,555,777);
         match6 = match1;
 
         dataretreiver = Mockito.mock(Dataretreiver.class);

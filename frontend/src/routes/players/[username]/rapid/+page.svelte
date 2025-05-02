@@ -19,6 +19,14 @@
             console.error('Failed to fetch rapid games');
         }
     });
+    function formatDate(timestamp) {
+        // If it's in seconds, convert to milliseconds
+        if (timestamp < 1000000000000) {
+            timestamp *= 1000;
+        }
+        const date = new Date(timestamp);
+        return date.toLocaleString(); // You can adjust toLocaleString options for formatting
+    }
 
     function resultColor(result) {
         if (result === 'W') return 'green';
@@ -46,6 +54,7 @@
                 }
             ]
         };
+
 
         const config = {
             type: 'line',
@@ -148,7 +157,7 @@
                     <span class="game-mode">{game.mode}</span>
                     <span class="game-result" style="color: {resultColor(game.result)}">{game.result}</span>
                 </div>
-
+                <p style="color: #ccc; font-size: 0.9rem;">Ended on: {formatDate(game.endTime)}</p>
                 {#if game.isWhite}
                     <strong>{username} ({game.playerRating})</strong> vs
                     <a href={`/players/${game.opponent}`} class="game-opponent">
