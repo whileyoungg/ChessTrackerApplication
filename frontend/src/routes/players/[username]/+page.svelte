@@ -129,24 +129,31 @@
         {#if player.blitzRating !== -1}
             <div class="rating-card">
                 <h4>Blitz Rating</h4>
-                <p>{player.blitzRating}</p>
+                <a href={`/players/${player.username}/blitz`} style="text-decoration: none; color: inherit;">
+                    <p>{player.blitzRating}</p>
+                </a>
             </div>
         {/if}
 
         {#if player.rapidRating !== -1}
             <div class="rating-card">
                 <h4>Rapid Rating</h4>
-                <p>{player.rapidRating}</p>
+                <a href={`/players/${player.username}/rapid`} style="text-decoration: none; color: inherit;">
+                    <p>{player.rapidRating}</p>
+                </a>
             </div>
         {/if}
 
         {#if player.bulletRating !== -1}
             <div class="rating-card">
                 <h4>Bullet Rating</h4>
-                <p>{player.bulletRating}</p>
+                <a href={`/players/${player.username}/bullet`} style="text-decoration: none; color: inherit;">
+                    <p>{player.bulletRating}</p>
+                </a>
             </div>
         {/if}
     </div>
+
     <button on:click={() => goto(`/players/${player.username}/playerCard`)} class="match-url-btn">
         Player Card
     </button>

@@ -21,84 +21,88 @@ private String correctNickname;
     public ArrayList<Match> getMatches(String username) {
         ArrayList<Match> matches = new ArrayList<>();
 
-        String endpoint = getLatestArchiveUrl(username);
+        ArrayList<String> endpoints = getLatestArchiveUrl(username);
 
         try {
-            URL url = new URL(endpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            int status = conn.getResponseCode();
-            if (status != 200) {
-                throw new NoUserFoundException("User not found or API error: HTTP status " + status);
-            }
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream())
-            );
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-            conn.disconnect();
+            for(String endpoint : endpoints) {
 
-            // Parse JSON
-            JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
-            JsonArray games = jsonObject.getAsJsonArray("games");
 
-            for (JsonElement gameElement : games) {
-                JsonObject game = gameElement.getAsJsonObject();
-
-                String urlString = game.get("url").getAsString();
-                String mode = game.get("time_class").getAsString();
-                String winner = game.has("winner") ? game.get("winner").getAsString() : "";
-                String white = game.getAsJsonObject("white").get("username").getAsString();
-                String black = game.getAsJsonObject("black").get("username").getAsString();
-                int whiteRating = game.getAsJsonObject("white").get("rating").getAsInt();
-                int blackRating = game.getAsJsonObject("black").get("rating").getAsInt();
-                String whiteResult = game.getAsJsonObject("white").get("result").getAsString();
-                String blackResult = game.getAsJsonObject("black").get("result").getAsString();
-
-                long endTime = game.get("end_time").getAsLong();
-                int playerRating = 0;
-                int opponentRating = 0;
-                String result = "?";
-                String opponentNickname ="";
-                boolean isWhite = false;
-                if(white.equalsIgnoreCase(username)){
-                    correctNickname = white;
-                    opponentNickname = black;
-                    playerRating = whiteRating;
-                    opponentRating = blackRating;
-                    isWhite = true;
-                    if(whiteResult.equals("win")){
-                        result = "W";
-                    } else if(whiteResult.equals(blackResult)){
-                        result ="D";
-                    } else {
-                        result = "L";
-                    }
-                } else if(black.equalsIgnoreCase(username)){
-                    correctNickname = black;
-                    opponentNickname = white;
-                    isWhite = false;
-                    playerRating = blackRating;
-                    opponentRating = whiteRating;
-
-                    if(blackResult.equals("win")){
-                        result = "W";
-                    } else if(blackResult.equals(whiteResult)) {
-                        result = "D";
-                    } else {
-                        result = "L";
-                    }
+                URL url = new URL(endpoint);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                int status = conn.getResponseCode();
+                if (status != 200) {
+                    throw new NoUserFoundException("User not found or API error: HTTP status " + status);
                 }
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream())
+                );
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                conn.disconnect();
 
-                matches.add(new Match(urlString, result,mode.toUpperCase(),endTime, opponentNickname, isWhite,playerRating,opponentRating));
+                // Parse JSON
+                JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
+                JsonArray games = jsonObject.getAsJsonArray("games");
+
+                for (JsonElement gameElement : games) {
+                    JsonObject game = gameElement.getAsJsonObject();
+
+                    String urlString = game.get("url").getAsString();
+                    String mode = game.get("time_class").getAsString();
+                    String winner = game.has("winner") ? game.get("winner").getAsString() : "";
+                    String white = game.getAsJsonObject("white").get("username").getAsString();
+                    String black = game.getAsJsonObject("black").get("username").getAsString();
+                    int whiteRating = game.getAsJsonObject("white").get("rating").getAsInt();
+                    int blackRating = game.getAsJsonObject("black").get("rating").getAsInt();
+                    String whiteResult = game.getAsJsonObject("white").get("result").getAsString();
+                    String blackResult = game.getAsJsonObject("black").get("result").getAsString();
+
+                    long endTime = game.get("end_time").getAsLong();
+                    int playerRating = 0;
+                    int opponentRating = 0;
+                    String result = "?";
+                    String opponentNickname = "";
+                    boolean isWhite = false;
+                    if (white.equalsIgnoreCase(username)) {
+                        correctNickname = white;
+                        opponentNickname = black;
+                        playerRating = whiteRating;
+                        opponentRating = blackRating;
+                        isWhite = true;
+                        if (whiteResult.equals("win")) {
+                            result = "W";
+                        } else if (whiteResult.equals(blackResult)) {
+                            result = "D";
+                        } else {
+                            result = "L";
+                        }
+                    } else if (black.equalsIgnoreCase(username)) {
+                        correctNickname = black;
+                        opponentNickname = white;
+                        isWhite = false;
+                        playerRating = blackRating;
+                        opponentRating = whiteRating;
+
+                        if (blackResult.equals("win")) {
+                            result = "W";
+                        } else if (blackResult.equals(whiteResult)) {
+                            result = "D";
+                        } else {
+                            result = "L";
+                        }
+                    }
+
+                    matches.add(new Match(urlString, result, mode.toUpperCase(), endTime, opponentNickname, isWhite, playerRating, opponentRating));
+                }
+                matches.sort((m1, m2) -> Long.compare(m2.endTime(), m1.endTime()));
+
+                matches = new ArrayList<>(matches.stream().limit(60).toList());
             }
-            matches.sort((m1, m2) -> Long.compare(m2.endTime(), m1.endTime()));
-
-            matches = new ArrayList<>(matches.stream().limit(15).toList());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,8 +189,9 @@ private String correctNickname;
             return null;
         }
     }
-    public String getLatestArchiveUrl(String username) {
+    public ArrayList<String> getLatestArchiveUrl(String username) {
         String endpoint = "https://api.chess.com/pub/player/" + username + "/games/archives";
+        ArrayList<String> urls = new ArrayList<>();
         try {
             URL url = new URL(endpoint);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -212,13 +217,27 @@ private String correctNickname;
             if (archives.size() == 0) {
                 return null;
             }
+            if(archives.size()>=3){
+                urls.add(archives.get(archives.size() - 1).getAsString());
+                urls.add(archives.get(archives.size() - 2).getAsString());
+                urls.add(archives.get(archives.size() - 3).getAsString());
+                return urls;
+            } else if(archives.size()==1){
+                urls.add(archives.get(archives.size() - 1).getAsString());
+                return urls;
+            } else if(archives.size()==2){
+                urls.add(archives.get(archives.size() - 1).getAsString());
+                urls.add(archives.get(archives.size() - 2).getAsString());
+                return urls;
+            }
 
-            return archives.get(archives.size() - 1).getAsString();
+
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+        return urls;
     }
 
 }

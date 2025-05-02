@@ -20,7 +20,7 @@ public class Dataretreivertest {
         assertThat(retreivedPlayer).isNotNull();
         assertThat(retreivedPlayer.username()).isEqualTo("ocevn");
         assertThat(retreivedMatches).isNotNull();
-        assertThat(retreivedMatches).hasSizeLessThanOrEqualTo(5); // assert on collection size
+        assertThat(retreivedMatches).hasSizeLessThanOrEqualTo(40); // assert on collection size
         assertThat(retreivedPlayer.rapidRating()).isEqualTo(1704);
     }
 }
