@@ -2,14 +2,19 @@
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { get } from 'svelte/store';
+    import { Chart, registerables } from 'chart.js';
+    Chart.register(...registerables);
 
     let games = [];
     let username = get(page).params.username;
-
+    let chartCanvas;
+    let chartInstance;
+    Chart.register(...registerables);
     onMount(async () => {
         const res = await fetch(`http://localhost:8080/api/players/${username}/rapid`);
         if (res.ok) {
             games = await res.json();
+            console.log("Fetched games:", games);
         } else {
             console.error('Failed to fetch rapid games');
         }
@@ -20,6 +25,48 @@
         if (result === 'D') return 'orange';
         if (result === 'L') return 'red';
         return 'gray';
+    }
+    function drawChart() {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        const reversedGames = [...games].reverse(); // clone & reverse safely
+
+        const data = {
+            labels: reversedGames.map((_, i) => `Game ${i + 1}`),
+            datasets: [
+                {
+                    label: 'Rating Progression',
+                    data: reversedGames.map(g => g.playerRating),
+                    borderColor: '#4CAF50',
+                    backgroundColor: '#81c784',
+                    fill: false,
+                    tension: 0.3
+                }
+            ]
+        };
+
+        const config = {
+            type: 'line',
+            data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: 'white' } }
+                },
+                scales: {
+                    x: { ticks: { color: 'white' } },
+                    y: { ticks: { color: 'white' } }
+                }
+            }
+        };
+
+        chartInstance = new Chart(chartCanvas, config);
+    }
+
+    $: if (games.length && chartCanvas) {
+        drawChart();
     }
 </script>
 
@@ -77,6 +124,12 @@
         width: 2cm;
         height: 1cm;
     }
+    canvas {
+        margin-bottom: 2rem;
+        background-color: #2f3e46;
+        padding: 1rem;
+        border-radius: 8px;
+    }
 
     .match-url-btn:hover {
         background-color: #45a049;
@@ -85,7 +138,9 @@
 
 <div class="page-wrapper">
     <h2>Recent Rapid Games for <a href={`/players/${username}`} class="game-opponent">{username}</a></h2>
-
+    {#if games.length}
+        <canvas bind:this={chartCanvas}></canvas>
+    {/if}
     {#if games.length > 0}
         {#each games as game}
             <div class="game-card">
