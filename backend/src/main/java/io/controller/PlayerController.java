@@ -2,8 +2,11 @@ package io.controller;
 
 
 import io.businessLogic.PlayerManager;
+import io.datarecords.Match;
 import io.datarecords.Player;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/players")
@@ -20,4 +23,17 @@ public class PlayerController {
     public Player getPlayer(@PathVariable String username) {
         return playerManager.getPlayer(username);
     }
+    @GetMapping("/{username}/rapid")
+    public List<Match> getRapidMatches(@PathVariable String username) {
+        return playerManager.getRapidMatches(username);
+    }
+    @GetMapping("/{username}/blitz")
+    public List<Match> getBlitzMatches(@PathVariable String username) {
+        return playerManager.getBlitzMatches(username);
+    }
+    @GetMapping("/{username}/bullet")
+    public List<Match> getBulletMatches(@PathVariable String username) {
+        return playerManager.getBulletMatches(username);
+    }
+
 }

@@ -24,6 +24,14 @@
             console.error('Failed to fetch player');
         }
     });
+    function formatDate(timestamp) {
+        // If it's in seconds, convert to milliseconds
+        if (timestamp < 1000000000000) {
+            timestamp *= 1000;
+        }
+        const date = new Date(timestamp);
+        return date.toLocaleString(); // You can adjust toLocaleString options for formatting
+    }
 
 </script>
 
@@ -129,24 +137,31 @@
         {#if player.blitzRating !== -1}
             <div class="rating-card">
                 <h4>Blitz Rating</h4>
-                <p>{player.blitzRating}</p>
+                <a href={`/players/${player.username}/blitz`} style="text-decoration: none; color: inherit;">
+                    <p>{player.blitzRating}</p>
+                </a>
             </div>
         {/if}
 
         {#if player.rapidRating !== -1}
             <div class="rating-card">
                 <h4>Rapid Rating</h4>
-                <p>{player.rapidRating}</p>
+                <a href={`/players/${player.username}/rapid`} style="text-decoration: none; color: inherit;">
+                    <p>{player.rapidRating}</p>
+                </a>
             </div>
         {/if}
 
         {#if player.bulletRating !== -1}
             <div class="rating-card">
                 <h4>Bullet Rating</h4>
-                <p>{player.bulletRating}</p>
+                <a href={`/players/${player.username}/bullet`} style="text-decoration: none; color: inherit;">
+                    <p>{player.bulletRating}</p>
+                </a>
             </div>
         {/if}
     </div>
+
     <button on:click={() => goto(`/players/${player.username}/playerCard`)} class="match-url-btn">
         Player Card
     </button>
@@ -163,6 +178,7 @@
                         {game.result}
                     </span>
                     </div>
+                    <p style="color: #ccc; font-size: 0.9rem;">Ended on: {formatDate(game.endTime)}</p>
                     {#if game.isWhite}
                         <strong>{player.username} ({game.playerRating})</strong> vs
                         <a href={`/players/${game.opponent}`} class="game-opponent">{game.opponent} ({game.opponentRating})</a>

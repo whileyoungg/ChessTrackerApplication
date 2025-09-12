@@ -23,8 +23,10 @@ Recent match history and results.
 
 Includes lightweight widgets, ideal for embedding in OBS or other platforms.
 
-Features
+
+
 Search players by username
+
 
 View Blitz, Rapid, and Bullet ratings
 
@@ -34,4 +36,6 @@ Country flag and title support
 
 REST API for data access
 
-Widget mode for stream overlays
+
+Widget mode for stream overlays(to be upgraded)
+
